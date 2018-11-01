@@ -4,13 +4,24 @@
 ; Project 2: GP
 
 
-(defvar x)    ; Global variables x, y, z
-(defvar y)
-(defvar z)
+(defvar X)    ; Global variables x, y, z
+(defvar Y)
+(defvar Z)
 (defvar pool '())   ; Pool to hold expressions
 (defvar nextpool '()) ; Pool to hold next generation
 (defvar g_count 0)    ; Generation count
- ; TODO: create global for Test samples
+
+(defvar testsamples      ; Set of Test samples to use
+  '((0 -2 1 -16)
+    (-4 -5 -3 58)
+    (9 8 -6 72)
+    (9 -7 5 113)
+    (-8 7 3 150)
+    (5 4 -5 20)
+    (6 -4 6 41)
+    (-5 3 -7 -24)
+    (-6 -5 9 18)
+    (1 0 2 2)))
 
 
 ; Function to return a random integer operand, from -9 to 9
@@ -50,6 +61,15 @@
 
 
 
+; Function to calculate fitness
+(defun runexpr (rvars rexpr)
+  (let ((X (car rvars))
+        (Y (nth 1 rvars))
+        (Z (nth 2 rvars)))
+    (eval rexpr)))
+
+
+
 ; Fill pool with 50 expressions
 
 (loop
@@ -57,16 +77,15 @@
       (setq pool (append (list (randexpr)) pool))
       (when (>= (list-length pool) 50)
         (return pool))))
-(loop for x from 1 to (list-length pool)
-      do (print (nth x pool)))
+(loop for x from 0 to (- (list-length pool) 1)
+      do (format t "~D: Expr: ~S , Eval: ~D ~%" x (nth x pool) (runexpr '(1 1 1) (nth x pool))))
 
 
-
-
+; NEXT GOAL: Print Expr, Eval, and Fitness for each test sample, for each expr
 
 ; Scratch space
-
-
+(loop for x from 0 to (- (list-length testsamples) 1) 
+      do (print (nth x testsamples)))
 
 
 
