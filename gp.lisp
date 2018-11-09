@@ -61,13 +61,26 @@
 
 
 
-; Function to calculate fitness
+; Function to run expression with the variable list
 (defun runexpr (rvars rexpr)
   (let ((X (car rvars))
         (Y (nth 1 rvars))
         (Z (nth 2 rvars)))
     (eval rexpr)))
 
+
+
+; Function that takes an expression and test sample
+; Returns a list of (rexpr evaluation fitness)
+(defun fitness (rexpr rsample)
+  (let* ((retfit)
+         (reval)
+         (rvars (list (nth 0 rsample)
+                     (nth 1 rsample)
+                     (nth 2 rsample))))
+    (setq reval (runexpr rvars rexpr))
+    (list rexpr reval)))
+;THIS FUNCTION IS NOT DONE, CURRENTLY DEVELOPING
 
 
 ; Fill pool with 50 expressions
@@ -81,11 +94,18 @@
       do (format t "~D: Expr: ~S , Eval: ~D ~%" x (nth x pool) (runexpr '(1 1 1) (nth x pool))))
 
 
+
 ; NEXT GOAL: Print Expr, Eval, and Fitness for each test sample, for each expr
 
 ; Scratch space
 (loop for x from 0 to (- (list-length testsamples) 1) 
       do (print (nth x testsamples)))
+
+
+(terpri)
+(print "fitness test")
+(print (fitness '(+ 1 X) '(1 2 3 20))) 
+
 
 
 
