@@ -9,6 +9,7 @@
 (defvar Z)
 (defvar pool '())   ; Pool to hold expressions
 (defvar nextpool '()) ; Pool to hold next generation
+(defvar mostfit '(() 1000))  ; Variable to hold most fit expr of the gen
 (defvar g_count 0)    ; Generation count
 
 (defvar testsamples      ; Set of Test samples to use
@@ -63,24 +64,38 @@
 
 ; Function to run expression with the variable list
 (defun runexpr (rvars rexpr)
-  (let ((X (car rvars))
+  (let ((X (car rvars))     ; set X, Y, Z to the values in rvars
         (Y (nth 1 rvars))
         (Z (nth 2 rvars)))
-    (eval rexpr)))
+    (eval rexpr)))          ; Run expr with set values
 
 
 
 ; Function that takes an expression and test sample
-; Returns a list of (rexpr evaluation fitness)
-(defun fitness (rexpr rsample)
-  (let* ((retfit)
-         (reval)
-         (rvars (list (nth 0 rsample)
-                     (nth 1 rsample)
-                     (nth 2 rsample))))
-    (setq reval (runexpr rvars rexpr))
-    (list rexpr reval)))
-;THIS FUNCTION IS NOT DONE, CURRENTLY DEVELOPING
+; Returns a list of (rexpr fitness)
+(defun fitness (rexpr rsamples)
+  (let* ((retfit 0)        ; Fitness value to return later
+         (rvars)           ; List of X, Y, Z initialized with sample values below
+         (reval)           ; The evaluation of the function
+         (delta))          ; Difference between actual answer and evaluation
+    (loop for sample in rsamples                       ; For each sample in the sample list
+          do (setq rvars (list (nth 0 sample)          ; Set X, Y, Z
+                               (nth 1 sample)
+                               (nth 2 sample)))
+             (setq reval (runexpr rvars rexpr))        ; Evaluate with set values
+             (setq delta (- (nth 3 sample) reval))     ; Find delta
+          (setq retfit (+ (abs delta) retfit)))        ; Add the absolute value of delta to existing retfit
+    (list rexpr retfit)))                              ; Return expr and its fitness
+
+
+
+; Function that will see if the current expression and fitness
+; is lower than the current most fit expression
+(defun checkfit (fitlist mostfit)
+  (if (< (nth 1 fitlist) (nth 1 mostfit))  ; Compare the fitnesses of current expression and
+      T                                    ; most recent fittest expression
+      NIL))
+
 
 
 ; Fill pool with 50 expressions
@@ -91,20 +106,21 @@
       (when (>= (list-length pool) 50)
         (return pool))))
 (loop for x from 0 to (- (list-length pool) 1)
-      do (format t "~D: Expr: ~S , Eval: ~D ~%" x (nth x pool) (runexpr '(1 1 1) (nth x pool))))
+      do (format t "~D: EXPR: ~S , FITNESS: ~D~%"
+                 x
+                 (nth 0 (fitness (nth x pool) testsamples))
+                 (nth 1 (fitness (nth x pool) testsamples)))
+         (if (checkfit (fitness (nth x pool) testsamples) mostfit)
+             (setq mostfit (list (nth 0 (fitness (nth x pool) testsamples))
+                                 (nth 1 (fitness (nth x pool) testsamples))))))
+(print "MOST FIT:")
+(print mostfit)
 
 
 
-; NEXT GOAL: Print Expr, Eval, and Fitness for each test sample, for each expr
 
 ; Scratch space
-(loop for x from 0 to (- (list-length testsamples) 1) 
-      do (print (nth x testsamples)))
 
-
-(terpri)
-(print "fitness test")
-(print (fitness '(+ 1 X) '(1 2 3 20))) 
 
 
 
