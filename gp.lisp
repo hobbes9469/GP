@@ -128,11 +128,17 @@
          (if (checkfit (fitness (nth x pool) testsamples) mostfit)
              (setq mostfit (list (nth 0 (fitness (nth x pool) testsamples))
                                  (nth 1 (fitness (nth x pool) testsamples))))))
-(print "MOST FIT:")
-(print mostfit)
+(format t "MOST FIT:~D~%" mostfit)
 (let ((par_ind1 (random (list-length pool)))
-      (par_ind2 (random (list-length pool))))
-  (format t "ind1: ~D , ind2: ~D" par_ind1 par_ind2))
+      (par_ind2 (random (list-length pool)))
+      (crossed '())
+      (par1 '())
+      (par2 '()))
+  (setq par1 (nth par_ind1 pool))
+  (setq par2 (nth par_ind2 pool))
+  (format t "ind1: ~D , ind2: ~D~%" par1 par2)
+  (setq crossed (crossover par1 par2))
+  (format t "crossed1: ~D , crossed2: ~D~%" (nth 0 crossed) (nth 1 crossed)))
 ; Picked 2 random indexes and will select parents for crossover
 
 
