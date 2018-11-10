@@ -97,6 +97,21 @@
       NIL))
 
 
+	  
+; Function to take 2 expressions and cross them over at a random point
+(defun crossover (rexpr1 rexpr2)
+  (let ((randindex (random 3))
+        (cross1 '())
+        (cross2 '()))
+    (print randindex)
+    (loop for x from 0 to randindex
+          do (setq cross1 (append cross1 (list (nth x rexpr2))))
+             (setq cross2 (append cross2 (list (nth x rexpr1)))))
+    (loop for x from (+ randindex 1) to 2
+          do (setq cross1 (append cross1 (list (nth x rexpr1))))
+             (setq cross2 (append cross2 (list (nth x rexpr2)))))
+    (list cross1 cross2)))
+	
 
 ; Fill pool with 50 expressions
 
@@ -115,7 +130,10 @@
                                  (nth 1 (fitness (nth x pool) testsamples))))))
 (print "MOST FIT:")
 (print mostfit)
-
+(let ((par_ind1 (random (list-length pool)))
+      (par_ind2 (random (list-length pool))))
+  (format t "ind1: ~D , ind2: ~D" par_ind1 par_ind2))
+; Picked 2 random indexes and will select parents for crossover
 
 
 
