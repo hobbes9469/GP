@@ -115,53 +115,42 @@
 
 ; Fill pool with 50 expressions
 
-(loop for x from 1 to 2
-      do (print x))
-(loop
-  (if (> 50 (list-length pool))
-      (setq pool (append (list (randexpr)) pool))
-      (when (>= (list-length pool) 50)
-        (return pool))))
-(setq g_count (+ g_count 1))
-(format t "Generation: ~D~%" g_count)
-(loop for x from 0 to (- (list-length pool) 1)
-      do (format t "~D: EXPR: ~S , FITNESS: ~D~%"
-                 x
-                 (nth 0 (fitness (nth x pool) testsamples))
-                 (nth 1 (fitness (nth x pool) testsamples)))
-         (if (checkfit (fitness (nth x pool) testsamples) mostfit)
-             (setq mostfit (list (nth 0 (fitness (nth x pool) testsamples))
-                                 (nth 1 (fitness (nth x pool) testsamples))))))
-(format t "MOST FIT:~D~%" mostfit)
-(setq best_fit (append (list (list g_count mostfit) ) best_fit))
-(loop while (not (equal pool nil))
-      do (let ((par_ind1 (random (list-length pool)))
-               (par_ind2 (random (list-length pool)))
-               (crossed '())
-               (par1 '())
-               (par2 '()))
-           (setq par1 (nth par_ind1 pool))
-           (setq par2 (nth par_ind2 pool))
-           (format t "ind1: ~D , ind2: ~D~%" par1 par2)
-           (setq crossed (crossover par1 par2))
-           (format t "crossed1: ~D , crossed2: ~D~%" (nth 0 crossed) (nth 1 crossed))
-           (setq nextpool (append nextpool (list (nth 0 crossed))))
-           (setq nextpool (append nextpool (list (nth 1 crossed))))
-           (setq pool (remove par1 pool))
-           (setq pool (remove par2 pool))))
-(setq pool nextpool)
-(setq nextpool nil)
-
-
-
-; Picked 2 random indexes and will select parents for crossover
-
-
-
-; Scratch space
-
-
-
+(loop for x from 1 to 50              ; For 50 generations
+      do (loop
+           (if (> 50 (list-length pool))     ; Fill the pool with 50 expressions
+               (setq pool (append (list (randexpr)) pool))
+               (when (>= (list-length pool) 50)
+                 (return pool))))
+         (setq g_count (+ g_count 1))        ; Bump up the generation count
+         (format t "Generation: ~D~%" g_count)
+         (loop for x from 0 to (- (list-length pool) 1)
+               do (format t "~D: EXPR: ~S , FITNESS: ~D~%"       ; Output the fitness for the expressions
+                          x
+                          (nth 0 (fitness (nth x pool) testsamples))
+                          (nth 1 (fitness (nth x pool) testsamples)))
+                  (if (checkfit (fitness (nth x pool) testsamples) mostfit)     ; Update most fit expression if necessary
+                      (setq mostfit (list (nth 0 (fitness (nth x pool) testsamples))
+                                          (nth 1 (fitness (nth x pool) testsamples))))))
+         (format t "MOST FIT:~D~%" mostfit)
+         (setq best_fit (append (list (list g_count mostfit) ) best_fit))  ; Save a copy of the most fit expression
+         (loop while (not (equal pool nil))
+               do (let ((par_ind1 (random (list-length pool)))       ; Create crossed kids with 2 parents
+                        (par_ind2 (random (list-length pool)))
+                        (crossed '())
+                        (par1 '())
+                        (par2 '()))
+                    (setq par1 (nth par_ind1 pool))                  
+                    (setq par2 (nth par_ind2 pool))
+                    (format t "ind1: ~D , ind2: ~D~%" par1 par2)
+                    (setq crossed (crossover par1 par2))
+                    (format t "crossed1: ~D , crossed2: ~D~%" (nth 0 crossed) (nth 1 crossed))
+                    (setq nextpool (append nextpool (list (nth 0 crossed))))      ; Add kids to the next pool
+                    (setq nextpool (append nextpool (list (nth 1 crossed))))
+                    (setq pool (remove par1 pool))             ; Remove parents from current pool
+                    (setq pool (remove par2 pool))))
+         (setq pool nextpool)     ; Bump up the pools
+         (setq nextpool nil))
+(format t "BEST OF EACH GENERATION: ~S:~%" best_fit)
 
 
 
