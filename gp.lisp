@@ -103,7 +103,6 @@
   (let ((randindex (random 3))
         (cross1 '())
         (cross2 '()))
-    (print randindex)
     (loop for x from 0 to randindex
           do (setq cross1 (append cross1 (list (nth x rexpr2))))
              (setq cross2 (append cross2 (list (nth x rexpr1)))))
@@ -129,16 +128,25 @@
              (setq mostfit (list (nth 0 (fitness (nth x pool) testsamples))
                                  (nth 1 (fitness (nth x pool) testsamples))))))
 (format t "MOST FIT:~D~%" mostfit)
-(let ((par_ind1 (random (list-length pool)))
-      (par_ind2 (random (list-length pool)))
-      (crossed '())
-      (par1 '())
-      (par2 '()))
-  (setq par1 (nth par_ind1 pool))
-  (setq par2 (nth par_ind2 pool))
-  (format t "ind1: ~D , ind2: ~D~%" par1 par2)
-  (setq crossed (crossover par1 par2))
-  (format t "crossed1: ~D , crossed2: ~D~%" (nth 0 crossed) (nth 1 crossed)))
+(loop while (not (equal pool nil))
+      do (let ((par_ind1 (random (list-length pool)))
+               (par_ind2 (random (list-length pool)))
+               (crossed '())
+               (par1 '())
+               (par2 '()))
+           (setq par1 (nth par_ind1 pool))
+           (setq par2 (nth par_ind2 pool))
+           (format t "ind1: ~D , ind2: ~D~%" par1 par2)
+           (setq crossed (crossover par1 par2))
+           (format t "crossed1: ~D , crossed2: ~D~%" (nth 0 crossed) (nth 1 crossed))
+           (setq nextpool (append nextpool (list (nth 0 crossed))))
+           (setq nextpool (append nextpool (list (nth 1 crossed))))
+           (setq pool (remove par1 pool))
+           (setq pool (remove par2 pool))))
+(setq pool nextpool)
+(setq nextpool nil)
+
+
 ; Picked 2 random indexes and will select parents for crossover
 
 
