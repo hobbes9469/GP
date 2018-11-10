@@ -11,6 +11,7 @@
 (defvar nextpool '()) ; Pool to hold next generation
 (defvar mostfit '(() 1000))  ; Variable to hold most fit expr of the gen
 (defvar g_count 0)    ; Generation count
+(defvar best_fit '()) ; Holds best of each generation
 
 (defvar testsamples      ; Set of Test samples to use
   '((0 -2 1 -16)
@@ -114,11 +115,15 @@
 
 ; Fill pool with 50 expressions
 
+(loop for x from 1 to 2
+      do (print x))
 (loop
   (if (> 50 (list-length pool))
       (setq pool (append (list (randexpr)) pool))
       (when (>= (list-length pool) 50)
         (return pool))))
+(setq g_count (+ g_count 1))
+(format t "Generation: ~D~%" g_count)
 (loop for x from 0 to (- (list-length pool) 1)
       do (format t "~D: EXPR: ~S , FITNESS: ~D~%"
                  x
@@ -128,6 +133,7 @@
              (setq mostfit (list (nth 0 (fitness (nth x pool) testsamples))
                                  (nth 1 (fitness (nth x pool) testsamples))))))
 (format t "MOST FIT:~D~%" mostfit)
+(setq best_fit (append (list (list g_count mostfit) ) best_fit))
 (loop while (not (equal pool nil))
       do (let ((par_ind1 (random (list-length pool)))
                (par_ind2 (random (list-length pool)))
@@ -145,6 +151,7 @@
            (setq pool (remove par2 pool))))
 (setq pool nextpool)
 (setq nextpool nil)
+
 
 
 ; Picked 2 random indexes and will select parents for crossover
